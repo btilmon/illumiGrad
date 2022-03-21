@@ -26,11 +26,11 @@ class Main():
         color = self.data[("color", 0)]
         depth = self.data[("depth", 0)]
         mask = self.data[("mask", 0)]
-        beforecolorE = self.camera.colorEgt.clone()
-        beforedepthK = self.camera.tofK.clone()
+        beforecolorE = self.camera.colorE.clone()
+        beforedepthK = self.camera.depthK.clone()
         initNum = 200
         # initialize training on single pair
-        print("\n Begin optimizing on initial color-ToF pair in trajectory \n")
+        print("\n Begin optimizing on initial color-depth pair in trajectory \n")
         for i in range(initNum):
             self.optimizer.zero_grad()
             predColor = self.camera(depth, color)
@@ -76,10 +76,10 @@ class Main():
 
         print("EXTRINSICS")
         print(beforecolorE)
-        print(self.camera.colorEgt)
+        print(self.camera.colorE)
         print("\n INTRINSICS")
         print(beforedepthK)
-        print(self.camera.tofK)
+        print(self.camera.depthK)
          
 if __name__ == "__main__":
     opt = Options()

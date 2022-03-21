@@ -4,7 +4,7 @@ import sys
 
 class BackprojectDepth(torch.nn.Module):
     """
-    Backproject absolute depth from ToF to point cloud
+    Backproject absolute depth from depth camera to point cloud
     (adapted from https://github.com/nianticlabs/monodepth2)
     """
     def __init__(self, opt):
@@ -68,16 +68,16 @@ class Camera(torch.nn.Module):
 
         # initialize color camera intrinsics K and extrinsics E
         self.initColorCamera()
-        # initialize ToF camera intrinsics K
-        self.initTofCamera()
+        # initialize depth camera intrinsics K
+        self.initDepthCamera()
 
 
-    def initTofCamera(self):
+    def initDepthCamera(self):
         # NYU Depth V2 has calibrated camera parameters
         # self.opt.refine is if you have already have decently good cailibration but 
         # still want to tune it
         if self.opt.refine:
-            self.tofK = torch.tensor(
+            self.depthK = torch.tensor(
                 [[582.624, 0, 0.0313, 0], 
                 [0, 582.691, 0.024, 0], 
                 [0, 0, 1, 0], 
@@ -92,7 +92,7 @@ class Camera(torch.nn.Module):
             col3 = torch.cat((offsets, offsets), dim=0)
             col3 = torch.cat((col3, torch.tensor([[1], [0]], requires_grad=False)), dim=0)
             col4 = torch.tensor([[0], [0], [0], [1]], requires_grad=False)
-            self.tofK = torch.nn.Parameter(
+            self.depthK = torch.nn.Parameter(
                 torch.cat((col1, col2, col3, col4), dim=1)[None], 
                 requires_grad=True)          
 
@@ -104,15 +104,15 @@ class Camera(torch.nn.Module):
                 [0, 519.470, 0.024, 0], 
                 [0, 0, 1, 0], 
                 [0, 0, 0, 1]], requires_grad=True)[None]
-            self.colorEgt = torch.tensor(
+            self.colorE = torch.tensor(
                 [[0.999, 0.0051, 0.0043, 0.025], 
                 [-0.0050, 0.999, -0.0037, -0.000293], 
                 [-0.00432, 0.0037, 0.999, 0.000662], 
                 [0, 0, 0, 1]])[None]
-            self.colorEgt = self.colorEgt.transpose(1,2)
-            self.colorEgt = torch.linalg.inv(self.colorEgt)
-            print(self.colorEgt); sys.exit()
-            self.colorEgt = torch.nn.Parameter(self.colorEgt, requires_grad=True)
+            self.colorE = self.colorE.transpose(1,2)
+            self.colorE = torch.linalg.inv(self.colorE)
+            print(self.colorE); sys.exit()
+            self.colorE = torch.nn.Parameter(self.colorE, requires_grad=True)
         else:
             # randomly generate focal lengths in a range
             # randomly generate remaining intrinsic parameters between 0 and 1
@@ -133,14 +133,14 @@ class Camera(torch.nn.Module):
             a = torch.cat((a, torch.zeros(1, 3)), dim=0)
             t = torch.tensor([[.1], [0.], [0.]], requires_grad=True) # translation vec
             t = torch.cat((t, torch.tensor([[1.]])))
-            self.colorEgt = torch.cat((a, t), dim=1)[None]
-            self.colorEgt = self.colorEgt.transpose(1, 2)
-            self.colorEgt = torch.linalg.inv(self.colorEgt)
-            self.colorEgt = torch.nn.Parameter(self.colorEgt, requires_grad=True)
+            self.colorE = torch.cat((a, t), dim=1)[None]
+            self.colorE = self.colorE.transpose(1, 2)
+            self.colorE = torch.linalg.inv(self.colorE)
+            self.colorE = torch.nn.Parameter(self.colorE, requires_grad=True)
 
-    def forward(self, tofDepth, color):
-        pointCloud = self.backprojectDepth(tofDepth, self.tofK)
-        predCoords = self.projectDepth(pointCloud, self.colorK, self.colorEgt)
+    def forward(self, depth, color):
+        pointCloud = self.backprojectDepth(depth, self.depthK)
+        predCoords = self.projectDepth(pointCloud, self.colorK, self.colorE)
         predColor = torch.nn.functional.grid_sample(color, 
                                                     predCoords, 
                                                     padding_mode="border", 
