@@ -38,6 +38,7 @@ Feel free to contribute to the following efforts, or other useful efforts not li
 
 * Extending illumiGrad to work with only stereo cameras. This is possible since we get metric depth from stereo. 
 * Implement a local pose graph over ~5 frame window. This might alleviate needing a decent initial calibration since we have more data (not sure).
+* Add coarse pose estimation loss to help with optimization. Must be lightweight (sparse optical flow for example). 
 
 
 
