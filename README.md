@@ -34,7 +34,7 @@ This image should appear after optimization is complete:
 
 ## Contributing
 
-In pursuit of usability, illumiGrad should be self contained, easy to install, and real time. Feel free to contribute to the following efforts below, or other useful efforts not listed. Contributions that either slow down illumiGrad below real time or require 3rd party dependencies (besides PyTorch) will not be considered. 
+In pursuit of usability, illumiGrad should be easy to install and real time. Feel free to contribute to the following efforts below, or other useful efforts not listed. Contributions that either slow down illumiGrad below real time or require 3rd party dependencies (besides PyTorch) will not be considered. 
 
 * Extend illumiGrad to work with only stereo cameras. This is possible since we get metric depth from stereo, which enables treating one of the cameras as a depth camera. 
 * Implement a local pose graph over ~5 frame window. This might alleviate needing a decent initial calibration since we have more data (not sure).
