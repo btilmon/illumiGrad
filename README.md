@@ -32,7 +32,12 @@ This image should appear after optimization is complete:
 
 ![GitHub Logo](calibrationPic.png)
 
+## In Progress
 
+Feel free to contribute to the following efforts, or other useful efforts not listed:
+
+* Extending illumiGrad to work with only stereo cameras. This is possible since we get metric depth from stereo. 
+* Implement a local pose graph over ~5 frame window. This might alleviate needing a decent initial calibration since we have more data (not sure).
 
 
 
